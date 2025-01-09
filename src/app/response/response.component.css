@@ -1,0 +1,19 @@
+.question-card {
+    background-color: #f8f9fa; /* Light gray background for questions */
+    border-left: 4px solid #007bff; /* Blue border for questions */
+    font-family: sans-serif;
+  }
+  .answer-card {
+    background-color: #e9ecef; /* Slightly darker gray for answers */
+    border-left: 4px solid #28a745; /* Green border for answers */
+    font-family: 'Open Sans', sans-serif; /* Font for answers */
+  }
+  .dropdown-label {
+    color: #495057; /* Darker color for dropdown labels */
+  }
+  .btn-custom {
+    font-weight: bold; /* Bold text for buttons */
+  }
+  .btn{
+    margin-right: 15px;
+  }

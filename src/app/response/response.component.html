@@ -1,0 +1,96 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+          <a class="navbar-brand" href="#">FileGenie</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      
+      <!-- Main Container -->
+      <div class="container mt-4">
+        <div class="row">
+          <!-- Section Dropdown -->
+          <div class="col-md-6 mb-4">
+            <label for="section" class="font-weight-bold dropdown-label">Select Section</label>
+            <select 
+              id="section" 
+              class="form-control" 
+              (change)="onSectionChange($event)"
+            >
+              <option value="" disabled selected>Select a section</option>
+              <option *ngFor="let section of sections" [value]="section.name">{{ section.name }}</option>
+            </select>
+          </div>
+      
+          <!-- Subsection Dropdown -->
+          <div *ngIf="selectedSection" class="col-md-6 mb-4">
+            <label for="subsection" class="font-weight-bold dropdown-label">Select Subsection</label>
+            <select 
+              id="subsection" 
+              class="form-control" 
+              (change)="onSubsectionChange($event)"
+            >
+              <option value="" disabled selected>Select a subsection</option>
+              <option *ngFor="let subsection of getSubsections(selectedSection)" [value]="subsection">
+                {{ subsection }}
+              </option>
+            </select>
+          </div>
+        </div>
+      
+        <!-- Questions Section -->
+        <div *ngIf="filteredQuestions.length > 0">
+          <h3 class="font-weight-bold">Questions</h3>
+          <div class="mt-4">
+            <div *ngFor="let question of filteredQuestions" class="mb-3">
+              <!-- Question Box -->
+              <div class="card question-card">
+                <div class="card-body">
+                  <p class="card-text font-weight-bold">{{ question.text }}</p>
+                </div>
+              </div>
+              <button class="btn btn-primary" (click)="generateAnswer(question)">Generate</button>
+              <!-- Answer Box -->
+               <div *ngIf="showAnswerBox" class="answer-box">
+                
+               
+              <div class="card answer-card mt-2">
+                <div class="card-body">
+                  <!-- Loading Indicator -->
+                  <div *ngIf="question.generating" class="text-muted mt-2">Generating answer...</div>
+      
+                  <!-- Generated Answer -->
+                  <div *ngIf="!question.generating && question.answer" class="mt-2">
+                    <p class="card-text">{{ question.answer }}</p>
+                    <button 
+                      class="btn btn-warning btn-sm btn-custom mt-2" 
+                      (click)="regenerateAnswer(question)"
+                    >
+                      Regenerate Answer
+                    </button>
+                    <button
+                    class = "btn btn-success btn-sm btn-custom mt-2"
+                    (click)="approveAnswer()"
+                    >Approve Response</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      
+        <!-- Message for No Questions -->
+        <div *ngIf="filteredQuestions.length === 0 && selectedSection && !selectedSubsection" class="mt-4">
+          <p class="text-muted">No questions available for the selected section.</p>
+        </div>
+      </div>
