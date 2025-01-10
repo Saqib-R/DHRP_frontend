@@ -1,99 +1,82 @@
-<!-- <div class="container mt-5">
-  <h2 class="enterprise-header mb-4 text-center text-primary">Document-Based Question Answering</h2>
+<div *ngIf="!isStarted" class="homepage-container d-flex flex-column align-items-center text-center">
+  <img src="/images/logo.png" alt="Logo" class="homepage-logo mb-4">
+  <h1 class="homepage-title fw-bold text-primary">
+    Welcome to Document-Based Question Answering
+  </h1>
+  <p class="homepage-description text-secondary mx-auto">
+    Generate answers based on your documents effortlessly. Start by selecting a section, choosing a subsection, and
+    getting answers tailored to your needs.
+  </p>
+  <button class="btn btn-primary px-5 py-3 mt-4" (click)="startApp()">Get Started</button>
+</div>
 
-  <div class="row mb-5">
-    <div class="col-md-6">
-      <div class="dropdown-container">
-        <label for="section" class="form-label fw-bold">Select Section</label>
-        <select id="section" class="form-control enterprise-select shadow-sm" (change)="onSectionChange($event)">
-          <option value="" disabled selected>Select a section</option>
-          <option *ngFor="let section of sections" [value]="section.name">{{ section.name }}</option>
-        </select>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div *ngIf="selectedSection" class="dropdown-container">
-        <label for="subsection" class="form-label fw-bold">Select Subsection</label>
-        <select id="subsection" class="form-control enterprise-select shadow-sm" (change)="onSubsectionChange($event)">
-          <option value="" disabled selected>Select a subsection</option>
-          <option *ngFor="let subsection of getSubsections(selectedSection)" [value]="subsection">
-            {{ subsection }}
-          </option>
-        </select>
-      </div>
-    </div>
-  </div>
 
-  <div *ngIf="filteredQuestions.length > 0">
-    <div *ngFor="let question of filteredQuestions" class="question-answer-card-container mb-4">
-      <div class="card qa-card shadow-lg border-0">
-        <div class="card-body">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <div class="d-flex align-items-center">
-              <i class="bi bi-question-circle-fill text-primary me-3 fs-4"></i>
-              <p class="question-text fw-semibold mb-0">{{ question.text }}</p>
-            </div>
-            <button class="btn btn-primary generate-btn px-3 py-2 d-flex align-items-center" (click)="generateAnswer(question)">
-              <i class="bi bi-robot me-2"></i> Generate Answer
+<div *ngIf="isStarted" class="qa-section-container d-flex flex-column align-items-center">
+
+  <div class="mb-4 bg-white rounded shadow-md" style="min-width: 1300px;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <!-- Collapsible Header -->
+        <div class="accordion-item bg-transparent border-bottom py-3">
+          <h2 class="accordion-header w-100" [attr.id]="'filterOptionsHeading'">
+            <button class="accordion-button bg-transparent fw-bold shadow-none d-flex align-items-end mb-3"
+              type="button" (click)="toggleFilterCollapse()" [class.collapsed]="isFilterCollapsed"
+              [attr.aria-expanded]="!isFilterCollapsed" [attr.data-bs-target]="'#filterOptionsCollapse'"
+              aria-controls="filterOptionsCollapse">
+              <!-- Filter Options Header Section -->
+              <div class="row align-items-center w-100 px-2">
+                <div class="col-10">
+                  <h4>Select Document and Apply Filters</h4>
+                </div>
+                <div class="col-2 text-end">
+                  <i class="transition-icon"
+                    [ngClass]="{'bi-chevron-down': isFilterCollapsed, 'bi-chevron-up': !isFilterCollapsed}"></i>
+                </div>
+              </div>
             </button>
-          </div>
+          </h2>
+          <!-- Collapsible Body for Dropdowns -->
+          <div *ngIf="!isFilterCollapsed" [attr.id]="'filterOptionsCollapse'" class="accordion-collapse w-100"
+            [ngClass]="{'show': !isFilterCollapsed}" [attr.aria-labelledby]="'filterOptionsHeading'">
+            <div class="accordion-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <!-- Document Dropdown -->
+                  <label for="documentSelect" class="form-label">Select DHRP Document</label>
+                  <select id="documentSelect" class="form-select" [(ngModel)]="selectedDocument"
+                    (change)="filterQuestionsByDocument()">
+                    <option *ngFor="let document of documents" [value]="document.id">{{ document.name }}</option>
+                  </select>
+                </div>
 
-          <hr class="my-3 text-muted">
-
-          <div *ngIf="showAnswerBox" class="answer-section mt-4">
-            <div *ngIf="question.generating" class="text-center text-muted py-3 d-flex flex-row align-items-center gap-1">
-              <i class="bi bi-arrow-repeat spinner-grow text-primary fs-3"></i>
-              <span class="ms-2 fw-medium">Generating answer...</span>
-            </div>
-
-            <div *ngIf="!question.generating && question.answer" class="answer-content">
-              <div class="d-flex align-items-center mb-4">
-                <i class="bi bi-chat-left-text-fill text-primary me-2 fs-5"></i>
-                <p class="answer-text text-secondary mb-0">{{ question.answer }}</p>
+                <div class="col-md-6">
+                  <!-- Section Dropdown -->
+                  <label for="sectionSelect" class="form-label">Filter by Section</label>
+                  <select id="sectionSelect" class="form-select" [(ngModel)]="selectedSection"
+                    (change)="filterQuestionsBySection()">
+                    <option *ngFor="let section of sections" [value]="section.id">{{ section.name }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col text-end">
+                  <!-- Save Button -->
+                  <button class="btn btn-primary" (click)="saveFilter()">Save</button>
+                </div>
               </div>
             </div>
-
-            <div *ngIf="!question.generating && question.answer" class="action-buttons mt-3 d-flex justify-content-end">
-              <button class="btn btn-secondary btn-sm me-2 px-3 py-2 d-flex align-items-center" (click)="regenerateAnswer(question)">
-                <i class="bi bi-arrow-clockwise me-2"></i> Regenerate
-              </button>
-              <button class="btn btn-success btn-sm px-3 py-2 d-flex align-items-center" (click)="approveAnswer()">
-                <i class="bi bi-check-circle-fill me-2"></i> Approve
-              </button>
-            </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
 
 
-  <div *ngIf="filteredQuestions.length === 0 && selectedSection && !selectedSubsection" class="no-questions-msg mt-5">
-    <p class="text-muted text-center fs-5">No questions available for the selected section.</p>
-  </div>
-</div> -->
 
 
 
-
-
-
-<!-- New design -->
-<div *ngIf="!isStarted" class="homepage-container d-flex flex-column justify-content-center align-items-center text-center">
-  <div class="homepage-card p-4">
-    <img src="assets/logo.png" alt="Logo" class="logo mb-4">
-    <h1 class="homepage-title text-primary fw-bold">Welcome to Document-Based Question Answering</h1>
-    <p class="homepage-description text-muted mb-5">
-      This application helps you generate answers based on document content. Simply select a section, choose a subsection, and get started with your questions!
-    </p>
-    <button class="btn btn-primary px-4 py-2 mt-4" (click)="startApp()">Get Started</button>
-  </div>
-</div>
-
-<!-- Main Question & Answer Section -->
-<div *ngIf="isStarted" class="qa-section-container">
   <div class="qa-card-container">
-    <!-- Question Card -->
     <div class="card qa-card shadow-md border-0">
       <div class="card-body">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -101,51 +84,54 @@
             <i class="bi bi-question-circle-fill text-primary me-3 fs-4"></i>
             <p class="question-text fw-semibold mb-0">{{ filteredQuestions[currentQuestionIndex].text }}</p>
           </div>
-          <button class="btn btn-primary generate-btn px-3 py-2 d-flex align-items-center" (click)="generateAnswer(filteredQuestions[currentQuestionIndex])">
+          <button class="btn btn-primary generate-btn px-3 py-2 d-flex align-items-center"
+            (click)="generateAnswer(filteredQuestions[currentQuestionIndex])">
             <i class="bi bi-robot me-2"></i> Generate Answer
           </button>
         </div>
 
         <hr class="my-3 text-muted">
 
-        <div >
+        <div>
           <div *ngIf="filteredQuestions[currentQuestionIndex].generating" class="text-center text-muted py-3">
             <i class="bi bi-arrow-repeat spinner-grow text-primary fs-3"></i>
             <span class="ms-2 fw-medium">Generating answer...</span>
           </div>
 
-          <div *ngIf="!filteredQuestions[currentQuestionIndex].generating && filteredQuestions[currentQuestionIndex].answer" class="answer-content">
+          <div
+            *ngIf="!filteredQuestions[currentQuestionIndex].generating && filteredQuestions[currentQuestionIndex].answer"
+            class="answer-content">
             <div class="d-flex align-items-center mb-4">
               <i class="bi bi-chat-left-text-fill text-primary me-2 fs-5"></i>
               <p class="answer-text text-secondary mb-0">{{ filteredQuestions[currentQuestionIndex].answer }}</p>
             </div>
 
             <div class="action-buttons mt-3 d-flex justify-content-end">
-              <button class="btn btn-secondary btn-sm me-2 px-3 py-2" (click)="regenerateAnswer(filteredQuestions[currentQuestionIndex])">
+              <button class="btn btn-secondary btn-sm me-3 px-4 py-2 rounded-pill action-btn" (click)="regenerateAnswer(filteredQuestions[currentQuestionIndex])">
                 <i class="bi bi-arrow-clockwise me-2"></i> Regenerate
               </button>
-              <button class="btn btn-success btn-sm px-3 py-2" (click)="approveAnswer()">
+              <button class="btn btn-success btn-sm px-4 py-2 rounded-pill action-btn" (click)="approveAnswer()">
                 <i class="bi bi-check-circle-fill me-2"></i> Approve
               </button>
             </div>
+
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Navigation with Numbered Pagination -->
     <div class="pagination-container">
-      <button class="btn-pagination" (click)="previousQuestion()" [disabled]="currentQuestionIndex === 0">&lt;</button>
+      <button class="btn-pagination" (click)="goToQuestion(currentQuestionIndex - 1)" [disabled]="currentQuestionIndex === 0">&lt;</button>
       <span class="pagination-numbers">
-        <button *ngFor="let number of getPaginationNumbers(); let i = index"
-                class="pagination-btn"
-                [class.active]="i === currentQuestionIndex"
-                (click)="goToQuestion(i)">
+        <button *ngFor="let number of getPaginationNumbers(); let i = index" class="pagination-btn"
+          [class.active]="i === currentQuestionIndex" (click)="goToQuestion(i)">
           {{ i + 1 }}
         </button>
       </span>
-      <button class="btn-pagination" (click)="nextQuestion()" [disabled]="currentQuestionIndex === filteredQuestions.length - 1">&gt;</button>
+      <button class="btn-pagination" (click)="goToQuestion(currentQuestionIndex + 1)"
+        [disabled]="currentQuestionIndex === filteredQuestions.length - 1">&gt;</button>
     </div>
+
 
   </div>
 </div>

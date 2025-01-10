@@ -25,82 +25,44 @@ interface Subsections {
   styleUrl: './response.component.css'
 })
 export class ResponseComponent {
-  showAnswerBox:boolean = false;
-
-  // Mock data for sections and subsections
-  // sections: Section[] = [
-  //   {
-  //     name: 'General',
-  //     subsections: [],
-  //     questions: [
-  //       { text: 'What is general information?', answer: '', generating: false, subsection: null, showAnswerBox: false },
-  //     ],
-  //   },
-  //   {
-  //     name: 'Risk Factors',
-  //     subsections: ['Financial Risks', 'Operational Risks'],
-  //     questions: [
-  //       { subsection: 'Financial Risks', text: 'What are financial risks?', answer: '', generating: false, showAnswerBox: false },
-  //       { subsection: 'Operational Risks', text: 'What are operational risks?', answer: '', generating: false, showAnswerBox: false },
-  //       { subsection: 'Operational Risks', text: 'What are operational risks?', answer: '', generating: false, showAnswerBox: false },
-  //       { subsection: 'Operational Risks', text: 'What are operational risks?', answer: '', generating: false, showAnswerBox: false },
-  //     ],
-  //   },
-  // ];
-
-  // selectedSection: string | null = null;
-  // selectedSubsection: string | null = null;
-  // filteredQuestions: Question[] = [];
-
-  // getSubsections(sectionName: string): string[] | undefined {
-  //   const section = this.sections.find((s) => s.name === sectionName);
-  //   return section?.subsections || [];
-  // }
-
-  // onSectionChange(event: Event) {
-  //   const target = event.target as HTMLSelectElement;
-  //   this.selectedSection = target.value || null;
-  //   this.selectedSubsection = null;
-  //   const section = this.sections.find((s) => s.name === this.selectedSection);
-
-  //   if (section) {
-  //     this.filteredQuestions = section.subsections.length
-  //       ? []
-  //       : section.questions.filter((q) => !q.subsection);
-  //   }
-  // }
-
-  // onSubsectionChange(event: Event) {
-  //   const target = event.target as HTMLSelectElement;
-  //   this.selectedSubsection = target.value || null;
-  //   const section = this.sections.find((s) => s.name === this.selectedSection);
-
-  //   if (section) {
-  //     this.filteredQuestions = section.questions.filter((q) => q.subsection === this.selectedSubsection);
-  //   }
-  // }
-
-  // generateAnswer(question: Question) {
-  //   question.generating = true;
-  //   this.showAnswerBox=true;
-  //   setTimeout(() => {
-  //     question.answer = `Generated answer for: ${question.text}`;
-  //     question.generating = false;
-  //   }, 2000);
-  // }
-
-  // regenerateAnswer(question: Question) {
-  //   this.generateAnswer(question);
-  // }
-
-  // approveAnswer(){
-  //   alert("Approved !");
-  // }
-
-
-  isStarted = false;
+  showAnswerBox: boolean = false;
+  isStarted: boolean = false;
   filteredQuestions: any[] = [];
-  currentQuestionIndex = 0;
+  currentQuestionIndex: number = 0;
+  isCollapsed = true;
+  selectedDocument: number = 1;
+  selectedSection: number = 1;
+  isFilterCollapsed = true;
+
+
+  // Mock data for documents and sections
+  documents = [
+    { id: 1, name: 'Document 1' },
+    { id: 2, name: 'Document 2' },
+    { id: 3, name: 'Document 3' }
+  ];
+
+  sections = [
+    { id: 1, name: 'Section 1' },
+    { id: 2, name: 'Section 2' },
+    { id: 3, name: 'Section 3' }
+  ];
+
+
+
+  // Mock data for questions (documentId and sectionId are used for filtering)
+  questions = [
+    { text: 'What is Angular?', answer: '', generating: false, documentId: 1, sectionId: 1 },
+    { text: 'Explain Dependency Injection in Angular', answer: '', generating: false, documentId: 1, sectionId: 2 },
+    { text: 'What is TypeScript?', answer: '', generating: false, documentId: 2, sectionId: 1 },
+    { text: 'How does Angular handle routing?', answer: '', generating: false, documentId: 3, sectionId: 3 },
+    // More questions here...
+  ];
+
+  ngOnInit() {
+    // Initially load questions after selecting default document and section
+    this.loadQuestions();
+  }
 
   startApp() {
     this.isStarted = true;
@@ -108,13 +70,10 @@ export class ResponseComponent {
   }
 
   loadQuestions() {
-    // Mock data for questions, this would typically be an API call
-    this.filteredQuestions = [
-      { text: 'What is Angular?', answer: '', generating: false },
-      { text: 'Explain Dependency Injection in Angular', answer: '', generating: false },
-      { text: 'What is TypeScript?', answer: '', generating: false },
-      // More questions here...
-    ];
+    // Filter questions based on the selected document and section
+    this.filteredQuestions = this.questions.filter(
+      (question) => question.documentId
+    );
   }
 
   previousQuestion() {
@@ -152,7 +111,29 @@ export class ResponseComponent {
   }
 
   getPaginationNumbers() {
+    console.log(Array.from({ length: this.filteredQuestions.length }, (_, i) => i));
+
     return Array.from({ length: this.filteredQuestions.length }, (_, i) => i);
+  }
+
+
+  toggleFilterCollapse() {
+    this.isFilterCollapsed = !this.isFilterCollapsed;
+    console.log((this.isFilterCollapsed));
+
+  }
+
+  filterQuestionsByDocument() {
+    console.log(this.selectedDocument);
+  }
+
+  filterQuestionsBySection() {
+    console.log(this.selectedSection);
+  }
+
+  saveFilter() {
+    console.log('Saving filter options: ', this.selectedDocument, this.selectedSection);
+    // Implement save logic here, such as saving to a database or localStorage
   }
 
 

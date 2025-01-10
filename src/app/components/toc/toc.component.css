@@ -87,3 +87,36 @@ h2 {
   font-size: 1.01rem;
 }
 
+.bounce-icon {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.fs-1 {
+  font-size: 3rem; /* Larger heading size */
+}
+
+.fs-5 {
+  font-size: 1.25rem; /* Increased paragraph size */
+}
+
+.fs-3 {
+  font-size: 4rem; /* Larger icon size */
+}

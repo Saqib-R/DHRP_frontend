@@ -8,4 +8,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'chatbot_helper';
+  ngOnInit(): void {
+    window.addEventListener('beforeunload', (event) => {
+      localStorage.removeItem('pdfData');
+    });
+  }
+
 }
